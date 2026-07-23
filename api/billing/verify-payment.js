@@ -33,7 +33,11 @@ export default async function handler(req, res) {
     const razorpayKeySecret = process.env.RAZORPAY_KEY_SECRET || "";
 
     // Verify HMAC Signature if live Razorpay secret exists
-    if (razorpayKeySecret && razorpay_order_id && razorpay_payment_id && razorpay_signature) {
+    if (razorpayKeySecret) {
+      if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+        return res.status(400).json({ error: "Missing required Razorpay payment fields" });
+      }
+
       const generatedSignature = crypto
         .createHmac("sha256", razorpayKeySecret)
         .update(`${razorpay_order_id}|${razorpay_payment_id}`)

@@ -32,6 +32,10 @@ export default async function handler(req, res) {
     }
 
     const amountInPaise = pkg.priceInr * 100;
+    if (amountInPaise < 100) {
+      return res.status(400).json({ error: "Amount must be at least 100 paise (1 INR)" });
+    }
+
     const razorpayKeyId = process.env.RAZORPAY_KEY_ID || "";
     const razorpayKeySecret = process.env.RAZORPAY_KEY_SECRET || "";
 
@@ -65,10 +69,11 @@ export default async function handler(req, res) {
           orderId = rzpData.id;
           isTestMode = false;
         } else {
-          console.warn("⚠️ Razorpay API fallback to simulation mode:", rzpData);
+          const errorMsg = rzpData.error ? rzpData.error.description : "Unknown Razorpay error";
+          return res.status(500).json({ error: `Razorpay API error: ${errorMsg}` });
         }
       } catch (e) {
-        console.warn("⚠️ Razorpay Order API call failed, fallback to test mode:", e.message);
+        return res.status(500).json({ error: `Razorpay connection failed: ${e.message}` });
       }
     }
 
