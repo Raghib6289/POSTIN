@@ -1,0 +1,1805 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>POSTIN - AI Social Media Post & Caption Creator</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+
+<body>
+  <canvas id="tubesCanvas" class="tubes-background-canvas"></canvas>
+  <div class="container">
+    <!-- POSTIN Sticky Header Navbar -->
+    <nav class="navbar">
+      <div class="brand-logo" onclick="window.scrollTo({top:0, behavior:'smooth'})">
+        <span class="brand-badge">⚡ POSTIN</span>
+      </div>
+
+      <div class="nav-links">
+        <span class="nav-link-item active" onclick="window.scrollTo({top:0, behavior:'smooth'})">✨ Studio</span>
+        <span class="nav-link-item" onclick="document.getElementById('draftsLibrary').scrollIntoView({behavior:'smooth'})">📁 Library</span>
+        <span class="nav-link-item" onclick="openRechargeModal()">⚡ Pricing</span>
+      </div>
+
+      <div id="headerAuthArea">
+        <button class="btn-auth" onclick="openAuthModal('login')">🔑 Sign In / Register</button>
+      </div>
+    </nav>
+
+    <!-- Hero Header Banner -->
+    <header>
+      <h1>📸 POSTIN AI Content Studio</h1>
+      <p>Multi-agent AI ecosystem writing viral captions, hashtag SEO, visual scene prompts & optimal post schedules</p>
+    </header>
+
+    <!-- Enterprise Auth Modal Popup -->
+    <div id="authModal" class="auth-modal-overlay">
+      <div class="auth-modal-card">
+        <button class="auth-modal-close" onclick="closeAuthModal()">✕</button>
+        
+        <!-- Auth Mode Tabs -->
+        <div class="auth-tabs">
+          <button class="auth-tab-btn active" id="tabBtnLogin" onclick="switchAuthMode('login')">Sign In</button>
+          <button class="auth-tab-btn" id="tabBtnSignup" onclick="switchAuthMode('signup')">Create Account</button>
+        </div>
+
+        <div class="auth-modal-title" id="authModalTitle">Welcome to POSTIN</div>
+        <div class="auth-modal-subtitle" id="authModalSubtitle">Sign in to your account to continue</div>
+
+        <!-- Inline Error Alert Badge -->
+        <div id="authErrorAlert" class="auth-error-badge" style="display: none;"></div>
+
+        <!-- Official Google Auth Option -->
+        <button type="button" class="btn-google-auth" onclick="handleGoogleSignIn()">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+          Continue with Google
+        </button>
+
+        <div class="auth-divider">OR CONTINUE WITH EMAIL</div>
+
+        <form id="authForm" onsubmit="handleAuthSubmit(event)">
+          <div class="auth-input-group">
+            <input type="text" id="authNameInput" class="auth-input" placeholder="Full Name (e.g. Alex Rivera)" style="display: none;">
+            <input type="email" id="authEmailInput" class="auth-input" placeholder="Email address (name@company.com)" required>
+            <div style="position: relative;">
+              <input type="password" id="authPasswordInput" class="auth-input" placeholder="Password (min 6 characters)" required style="padding-right: 42px; width: 100%; box-sizing: border-color;">
+              <span onclick="togglePasswordVisibility()" title="Toggle password visibility" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 14px; user-select: none; opacity: 0.7;">👁️</span>
+            </div>
+          </div>
+          <button type="submit" class="btn-auth-submit" id="authSubmitBtn" style="margin-top: 12px;">Sign In to Studio</button>
+        </form>
+
+        <div class="auth-toggle-msg" id="authToggleMsg" style="margin-top: 15px;">
+          Don't have an account? <a onclick="switchAuthMode('signup')">Create Free Account</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Token Recharge Modal (INR Pricing) -->
+    <div id="rechargeModal" class="auth-modal-overlay">
+      <div class="auth-modal-card" style="max-width: 780px;">
+        <button class="auth-modal-close" onclick="closeRechargeModal()">✕</button>
+        <div class="auth-modal-title">⚡ Recharge Tokens</div>
+        <div class="auth-modal-subtitle">Top up your account balance with minimal INR (₹) packages</div>
+
+        <div class="recharge-grid">
+          <!-- Starter Pack -->
+          <div class="pricing-card">
+            <div class="pricing-title">Starter Pack</div>
+            <div class="pricing-tokens">⚡ 50 Tokens</div>
+            <div class="pricing-price">₹99 <span>/ top-up</span></div>
+            <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 15px;">50 AI Social Post Generations (₹1.98 / post)</p>
+            <button class="btn-buy-package" onclick="buyTokenPackage('starter')">Buy Now - ₹99</button>
+          </div>
+
+          <!-- Growth Pack (Featured) -->
+          <div class="pricing-card featured">
+            <div class="pricing-badge">🔥 Most Popular</div>
+            <div class="pricing-title">Growth Pack</div>
+            <div class="pricing-tokens">⚡ 150 Tokens</div>
+            <div class="pricing-price">₹249 <span>/ top-up</span></div>
+            <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 15px;">150 AI Social Post Generations (₹1.66 / post)</p>
+            <button class="btn-buy-package" onclick="buyTokenPackage('growth')">Buy Now - ₹249</button>
+          </div>
+
+          <!-- Pro Pack -->
+          <div class="pricing-card">
+            <div class="pricing-title">Pro Business</div>
+            <div class="pricing-tokens">⚡ 500 Tokens</div>
+            <div class="pricing-price">₹599 <span>/ top-up</span></div>
+            <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 15px;">500 AI Social Post Generations + Priority Speed</p>
+            <button class="btn-buy-package" onclick="buyTokenPackage('pro')">Buy Now - ₹599</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- User Profile Modal -->
+    <div id="profileModal" class="auth-modal-overlay">
+      <div class="auth-modal-card" style="max-width: 420px;">
+        <button class="auth-modal-close" onclick="closeProfileModal()">✕</button>
+
+        <!-- Avatar + Name Header -->
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 20px; padding-top: 4px;">
+          <div id="profAvatarWrap" style="position: relative; width: 72px; height: 72px;">
+            <img id="profAvatarImg" src="" alt="Avatar" style="width: 72px; height: 72px; border-radius: 50%; object-fit: cover; border: 3px solid rgba(238,42,123,0.5); display: none;">
+            <div id="profAvatarInitials" style="width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-start), var(--primary-end)); display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 800; color: white; border: 3px solid rgba(238,42,123,0.5);">?</div>
+          </div>
+          <div style="text-align: center;">
+            <div id="profNameHeader" style="font-size: 18px; font-weight: 800; color: white; line-height: 1.2;">-</div>
+            <div id="profEmailHeader" style="font-size: 12px; color: var(--text-muted); margin-top: 3px;">-</div>
+          </div>
+          <span id="profPlanBadge" style="background: linear-gradient(90deg, var(--primary-start), var(--primary-mid)); color: #000; font-size: 10px; font-weight: 800; padding: 3px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px;">FREE TIER</span>
+        </div>
+
+        <!-- Details Card -->
+        <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
+          <div style="display: flex; justify-content: space-between; font-size: 13px;">
+            <span style="color: var(--text-muted);">Account Name:</span>
+            <span style="font-weight: 700; color: white;" id="profName">-</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 13px;">
+            <span style="color: var(--text-muted);">Email:</span>
+            <span style="font-weight: 700; color: white;" id="profEmail">-</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 13px;">
+            <span style="color: var(--text-muted);">Subscription Tier:</span>
+            <span style="font-weight: 700; color: var(--primary-start); text-transform: uppercase;" id="profPlan">FREE TIER</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 13px; align-items: center;">
+            <span style="color: var(--text-muted);">Available Tokens:</span>
+            <span class="credits-pill" id="profTokens">⚡ 10 Tokens</span>
+          </div>
+        </div>
+
+        <button class="btn-topup-header" onclick="closeProfileModal(); openRechargeModal();" style="width: 100%; padding: 12px; font-size: 14px; margin-bottom: 12px; border-radius: 12px;">⚡ Recharge Token Balance (₹)</button>
+        <button class="btn-profile-logout" onclick="closeProfileModal(); logout();">🚪 Log Out of Account</button>
+      </div>
+    </div>
+
+    <div class="workspace-grid">
+      <!-- Left Column: Input Form, Agent Trace & History -->
+      <div class="panel">
+        <div class="panel-title">Creative Prompt</div>
+        
+        <!-- Multimodal Image Upload -->
+        <div class="form-group">
+          <label>Upload Post Photo(s)</label>
+          <input type="file" id="imageInput" multiple accept="image/*" onchange="previewImages()" style="display: none;">
+          <button class="tone-btn" onclick="document.getElementById('imageInput').click()" style="width: 100%; border-style: dashed; border-color: var(--primary-mid);">📁 Choose Photo(s)</button>
+          <div class="preview-container" id="imagePreviewContainer"></div>
+        </div>
+
+        <!-- Optional Description -->
+        <div class="form-group">
+          <label for="topic">Post Description (Optional if photo is uploaded)</label>
+          <textarea class="form-input" id="topic" style="height: 80px; resize: none;" placeholder="E.g., Special promo for summer discount..." oninput="if(document.getElementById('imageInput').files.length === 0) { updateBannerText(this.value); document.getElementById('canvasText').value = this.value; }"></textarea>
+        </div>
+
+        <!-- Tone Selector -->
+        <div class="form-group">
+          <label>Select Post Tone</label>
+          <div class="tone-grid">
+            <button class="tone-btn active" onclick="setTone('casual', this)">Casual & Friendly</button>
+            <button class="tone-btn" onclick="setTone('funny', this)">Witty & Funny</button>
+            <button class="tone-btn" onclick="setTone('inspirational', this)">Inspirational</button>
+            <button class="tone-btn" onclick="setTone('bold', this)">Bold & Hype</button>
+          </div>
+        </div>
+
+        <button class="btn-generate" id="generateBtn" onclick="generatePostAssets()">Generate Social Post</button>
+
+        <!-- Multi-Agent Trace -->
+        <div class="panel-title" style="margin-top: 15px; border: none; padding-bottom: 0;">👥 Agent Collaboration Console</div>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <!-- Node 0: Analyst -->
+          <div class="agent-step" id="step-analyst">
+            <div class="agent-header">
+              <span>👁️ Image Analyst Agent</span>
+              <div class="agent-status" id="status-analyst">Idle</div>
+            </div>
+            <div class="agent-msg" id="msg-analyst">Waiting to review uploaded images...</div>
+          </div>
+
+          <!-- Node 0b: Alt Text -->
+          <div class="agent-step" id="step-altText">
+            <div class="agent-header">
+              <span>♿ Alt Text Agent</span>
+              <div class="agent-status" id="status-altText">Idle</div>
+            </div>
+            <div class="agent-msg" id="msg-altText">Waiting to write accessibility descriptions...</div>
+          </div>
+
+          <!-- Node 1: Writer -->
+          <div class="agent-step" id="step-writer">
+            <div class="agent-header">
+              <span>✍️ Caption Writer Agent</span>
+              <div class="agent-status" id="status-writer">Idle</div>
+            </div>
+            <div class="agent-msg" id="msg-writer">Waiting to write post caption options...</div>
+          </div>
+
+          <!-- Node 2: Strategist -->
+          <div class="agent-step" id="step-strategist">
+            <div class="agent-header">
+              <span>🏷️ Hashtag Strategist Agent</span>
+              <div class="agent-status" id="status-strategist">Idle</div>
+            </div>
+            <div class="agent-msg" id="msg-strategist">Waiting to select hashtag groups...</div>
+          </div>
+
+          <!-- Node 3: Planner -->
+          <div class="agent-step" id="step-planner">
+            <div class="agent-header">
+              <span>🎨 Visual Planner Agent</span>
+              <div class="agent-status" id="status-planner">Idle</div>
+            </div>
+            <div class="agent-msg" id="msg-planner">Waiting to design post scene prompt...</div>
+          </div>
+
+          <!-- Node 3b: Schedule Planner -->
+          <div class="agent-step" id="step-schedulePlanner">
+            <div class="agent-header">
+              <span>📅 Schedule & Strategy Agent</span>
+              <div class="agent-status" id="status-schedulePlanner">Idle</div>
+            </div>
+            <div class="agent-msg" id="msg-schedulePlanner">Waiting to plan schedule & target audience...</div>
+          </div>
+
+          <!-- Node 4: Verifier -->
+          <div class="agent-step" id="step-verifier">
+            <div class="agent-header">
+              <span>✅ QA Verifier Agent</span>
+              <div class="agent-status" id="status-verifier">Idle</div>
+            </div>
+            <div class="agent-msg" id="msg-verifier">Waiting to perform engagement check...</div>
+          </div>
+        </div>
+
+        <!-- Saved Drafts Library -->
+        <div class="panel-title" style="margin-top: 15px; border: none; padding-bottom: 0; display: flex; justify-content: space-between; align-items: center;">
+          <span>📂 Saved Drafts Library</span>
+          <button onclick="loadHistory()" style="background: none; border: none; color: var(--primary-mid); font-size: 11px; cursor: pointer; text-decoration: underline;">Refresh</button>
+        </div>
+        <div id="draftsLibrary" class="drafts-library-container" style="display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto; padding-right: 5px; margin-top: 5px;">
+          <div class="draft-empty-msg">No saved drafts yet. Click "Save to Drafts Library" after generating to save posts.</div>
+        </div>
+      </div>
+
+      <!-- Middle Column: Interactive Instagram Feed Mockup -->
+      <div class="panel" style="justify-content: flex-start; align-items: center;">
+        <div class="panel-title" style="width: 100%;">📸 Instagram Preview</div>
+        
+        <div class="instagram-mock-card">
+          <!-- Header -->
+          <div class="mock-header">
+            <div class="mock-avatar-container">
+              <div class="mock-avatar"></div>
+            </div>
+            <div class="mock-user-meta">
+              <div class="mock-username-row">
+                <input type="text" id="mockUsernameInput" value="yourbrand" oninput="updateMockHeader(); drawBanner();" class="mock-editable-input" placeholder="username" title="Double click to edit handle">
+              </div>
+              <div class="mock-location-row">
+                <input type="text" id="mockLocationInput" value="New York, NY" oninput="updateMockHeader()" class="mock-editable-input location" placeholder="Location">
+              </div>
+            </div>
+            <div class="mock-more-btn">•••</div>
+          </div>
+          
+          <!-- Media Viewport -->
+          <div class="mock-media-viewport">
+            <div id="instagramMediaImgContainer" style="display: none; width: 100%; height: 100%; position: relative;">
+              <img id="instagramMediaImg" src="" alt="Post visual">
+              <button class="carousel-nav-btn prev" id="carouselPrev" onclick="carouselMove(-1)">‹</button>
+              <button class="carousel-nav-btn next" id="carouselNext" onclick="carouselMove(1)">›</button>
+              <div class="carousel-dots" id="carouselDots"></div>
+            </div>
+            <canvas id="instagramMediaCanvas" width="400" height="400" style="display: block; width: 100%; height: auto; max-width: 100%; border-radius: 4px;"></canvas>
+          </div>
+          
+          <!-- Actions Bar -->
+          <div class="mock-actions">
+            <div class="mock-actions-left">
+              <span class="mock-icon-btn" id="likeIcon" onclick="toggleMockLike()" style="cursor: pointer; user-select: none;">🤍</span>
+              <span class="mock-icon-btn" style="opacity: 0.85;">💬</span>
+              <span class="mock-icon-btn" style="opacity: 0.85;">✈️</span>
+            </div>
+            <span class="mock-icon-btn" style="opacity: 0.85;">🔖</span>
+          </div>
+          
+          <!-- Caption, Hashtags & Alt Text -->
+          <div class="mock-content-body">
+            <div class="mock-likes-count" id="mockLikesText">Liked by <strong>instagram_agent</strong> and 256 others</div>
+            
+            <div class="mock-caption-section">
+              <span class="mock-username-bold" id="mockUsernameCaption">yourbrand</span>
+              <span class="mock-caption-text-rendered" id="mockCaptionRendered">Waiting for content generation...</span>
+              <span id="captionMoreBtn" style="display: none; color: var(--text-muted); cursor: pointer; font-size: 12px; margin-left: 4px;" onclick="expandMockCaption()">more</span>
+            </div>
+            
+            <!-- Alt Text Badge -->
+            <div class="mock-alt-badge" id="mockAltBadge" style="display: none;" title="Accessibility SEO details">
+              ♿ Alt Description: <span id="mockAltBadgeText" style="font-weight: normal; color: var(--text-muted);"></span>
+            </div>
+            
+            <div class="mock-time">1 MINUTE AGO</div>
+          </div>
+        </div>
+
+        <!-- Canvas Customizer Controls (Only shown when no images are uploaded) -->
+        <div id="canvasControls" class="canvas-customizer-card" style="width: 100%; margin-top: 15px; border-radius: 12px; background: rgba(30, 30, 48, 0.4); border: 1px solid var(--border); padding: 15px;">
+          <div style="font-weight: bold; font-size: 13px; color: white; margin-bottom: 10px; display: flex; align-items: center; gap: 5px;">
+            <span>🎨 Graphic Banner Creator</span>
+            <span style="font-size: 10px; font-weight: normal; color: var(--text-muted);">(No photo uploaded)</span>
+          </div>
+          
+          <div class="form-group" style="margin-bottom: 10px;">
+            <label>Select Background Theme</label>
+            <div style="display: flex; gap: 8px; align-items: center; margin-top: 4px;">
+              <button class="theme-dot active" data-theme="sunset" onclick="setBannerTheme('sunset')" style="background: linear-gradient(135deg, #f9ce34, #ee2a7b, #6228d7);" title="Sunset Glow"></button>
+              <button class="theme-dot" data-theme="space" onclick="setBannerTheme('space')" style="background: linear-gradient(135deg, #0f172a, #1e1b4b);" title="Deep Space"></button>
+              <button class="theme-dot" data-theme="teal" onclick="setBannerTheme('teal')" style="background: linear-gradient(135deg, #0d9488, #0284c7);" title="Neon Teal"></button>
+              <button class="theme-dot" data-theme="charcoal" onclick="setBannerTheme('charcoal')" style="background: linear-gradient(135deg, #1e293b, #0f172a);" title="Charcoal Dark"></button>
+            </div>
+          </div>
+          
+          <div class="form-group" style="margin-bottom: 10px;">
+            <label for="canvasText">Custom Banner Text</label>
+            <textarea class="form-input" id="canvasText" style="height: 60px; font-size: 13px; resize: none;" oninput="updateBannerText(this.value)" placeholder="Enter banner headline overlay..."></textarea>
+          </div>
+          
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+            <div class="form-group" style="flex: 1;">
+              <label>Text Font Size</label>
+              <input type="range" min="16" max="42" value="28" oninput="bannerFontSize = this.value; drawBanner();" style="width: 100%;">
+            </div>
+            <button class="btn-copy" onclick="downloadBanner()" style="align-self: flex-end; padding: 8px 12px; background: var(--primary-mid);">📥 Download Graphic</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Outputs & Analytics -->
+      <div class="panel" style="justify-content: flex-start;">
+        <div class="panel-title">
+          <span>✨ Post Generation Board</span>
+          <div id="saveDraftContainer" style="display: none; align-items: center;">
+            <button class="btn-copy" onclick="saveCurrentDraft()" style="background: linear-gradient(135deg, var(--success), #059669); border: none; padding: 6px 12px; font-weight: bold;">💾 Save Draft</button>
+          </div>
+        </div>
+        
+        <!-- Idle Placeholder -->
+        <div id="idleState" style="color: var(--text-muted); font-size: 14px; text-align: center; margin: auto 0; padding: 40px 0;">
+          No content generated yet. Provide details and click "Generate Social Post" to start.
+        </div>
+
+        <!-- Generated Outputs Tab Container -->
+        <div id="outputState" style="display: none; flex-direction: column; gap: 15px; width: 100%;">
+          
+          <!-- Extracted Topic Details -->
+          <div id="topicDetails" style="display: none; background: #09090e; border: 1px solid var(--border); border-radius: 10px; padding: 12px; font-size: 13px; line-height: 1.5;">
+            <span style="color: var(--primary-mid); font-weight: bold;">Extracted Post Context:</span>
+            <span id="extractedTopicText" style="color: var(--text-muted);"></span>
+          </div>
+
+          <!-- Tabs Navigation -->
+          <div class="tab-container">
+            <button class="tab-btn active" id="tabBtn-captions" onclick="switchTab('captions')">Captions</button>
+            <button class="tab-btn" id="tabBtn-hashtags" onclick="switchTab('hashtags')">Hashtags</button>
+            <button class="tab-btn" id="tabBtn-visual" onclick="switchTab('visual')">Visuals & SEO</button>
+            <button class="tab-btn" id="tabBtn-strategy" onclick="switchTab('strategy')">Posting Strategy</button>
+          </div>
+
+          <!-- Tab Content 1: Captions -->
+          <div class="tab-content active" id="tab-captions">
+            <div id="captionsList" style="display: flex; flex-direction: column; gap: 12px;"></div>
+          </div>
+
+          <!-- Tab Content 2: Hashtags -->
+          <div class="tab-content" id="tab-hashtags">
+            <button class="btn-copy" onclick="copyAllHashtags()" style="align-self: flex-start; margin-bottom: 5px;">📋 Copy All Hashtags</button>
+            
+            <div class="hashtag-group">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <div class="hashtag-title" style="margin-bottom: 0;">Broad Tags (High Volume)</div>
+                <button class="btn-copy" onclick="copyCategoryHashtags('hashtagsBroad')" style="padding: 4px 8px; font-size: 11px;">📋 Copy Group</button>
+              </div>
+              <div class="hashtag-list" id="hashtagsBroad"></div>
+            </div>
+
+            <div class="hashtag-group">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <div class="hashtag-title" style="margin-bottom: 0;">Niche Tags (Specific Interest)</div>
+                <button class="btn-copy" onclick="copyCategoryHashtags('hashtagsNiche')" style="padding: 4px 8px; font-size: 11px;">📋 Copy Group</button>
+              </div>
+              <div class="hashtag-list" id="hashtagsNiche"></div>
+            </div>
+
+            <div class="hashtag-group">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <div class="hashtag-title" style="margin-bottom: 0;">Custom Tags (Brand/Context)</div>
+                <button class="btn-copy" onclick="copyCategoryHashtags('hashtagsCustom')" style="padding: 4px 8px; font-size: 11px;">📋 Copy Group</button>
+              </div>
+              <div class="hashtag-list" id="hashtagsCustom"></div>
+            </div>
+          </div>
+
+          <!-- Tab Content 3: Visual Concept & SEO -->
+          <div class="tab-content" id="tab-visual">
+            <div style="font-weight: bold; font-size: 12px; color: var(--primary-start); margin-top: 5px; text-transform: uppercase;">🎨 Visual Design Concept</div>
+            <div class="visual-box" id="visualPromptText"></div>
+            <button class="btn-copy" onclick="copyText(document.getElementById('visualPromptText').textContent)" style="align-self: flex-start;">📋 Copy Visual Prompt</button>
+            
+            <div style="font-weight: bold; font-size: 12px; color: var(--primary-mid); margin-top: 10px; text-transform: uppercase;">♿ Accessibility Alt Text (SEO)</div>
+            <div class="visual-box" id="altTextText" style="border-color: rgba(238, 42, 123, 0.3);"></div>
+            <button class="btn-copy" onclick="copyText(document.getElementById('altTextText').textContent)" style="align-self: flex-start;">📋 Copy Alt Text</button>
+          </div>
+
+          <!-- Tab Content 4: Strategy & Schedule -->
+          <div class="tab-content" id="tab-strategy">
+            <div class="strategy-card" style="background: #09090e; border: 1px solid var(--border); border-radius: 12px; padding: 15px; display: flex; flex-direction: column; gap: 12px;">
+              <div class="strategy-item">
+                <span class="strategy-label" style="font-size: 11px; text-transform: uppercase; color: var(--primary-start); font-weight: bold; display: block; margin-bottom: 4px;">🎯 Target Audience Profile</span>
+                <span id="strategyAudience" class="strategy-value" style="font-size: 13.5px; line-height: 1.5; color: var(--text);"></span>
+              </div>
+              <hr style="border: 0; border-top: 1px solid var(--border);">
+              <div class="strategy-item">
+                <span class="strategy-label" style="font-size: 11px; text-transform: uppercase; color: var(--primary-mid); font-weight: bold; display: block; margin-bottom: 4px;">📅 Optimal Posting Time</span>
+                <span id="strategyTime" class="strategy-value" style="font-size: 13.5px; line-height: 1.5; color: var(--text);"></span>
+              </div>
+              <hr style="border: 0; border-top: 1px solid var(--border);">
+              <div class="strategy-item">
+                <span class="strategy-label" style="font-size: 11px; text-transform: uppercase; color: var(--primary-end); font-weight: bold; display: block; margin-bottom: 4px;">⚡ Suggested Content Format</span>
+                <span id="strategyType" class="strategy-value" style="font-size: 13.5px; line-height: 1.5; color: var(--text);"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Verifier Analysis Card -->
+          <div class="verifier-card">
+            <div class="score-container">
+              <div class="score-badge" id="qaScore">8</div>
+              <div>
+                <div class="score-label">Estimated Engagement Potential</div>
+                <div style="font-size: 12px; color: var(--text-muted);">Calculated by Social Verifier Node</div>
+              </div>
+            </div>
+            <div class="tips-list">
+              <div style="font-weight: bold; color: white; margin-bottom: 5px; font-size: 13px;">Optimization Recommendations:</div>
+              <div id="qaTips"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Minimal Clean POSTIN SaaS Footer -->
+    <footer class="footer-minimal">
+      <div class="brand-logo" onclick="window.scrollTo({top:0, behavior:'smooth'})">
+        <span class="brand-badge">⚡ POSTIN</span>
+      </div>
+      <div class="footer-rights">© 2026 POSTIN. All Rights Reserved.</div>
+    </footer>
+  </div>
+
+  <script>
+    let activeTone = 'casual';
+    let generatedData = null;
+    
+    // Banner builder variables
+    let selectedTheme = 'sunset';
+    let bannerText = 'E.g., Special promo for summer discount...';
+    let bannerFontSize = 28;
+    let bannerTextColor = '#ffffff';
+
+    // Carousel variables
+    let uploadedImages = [];
+    let currentCarouselIndex = 0;
+    
+    // Like status
+    let isMockLiked = false;
+
+    // Truncation variables
+    let isCaptionExpanded = false;
+    let currentCaptionFullText = '';
+
+    window.onload = function() {
+      loadHistory();
+      drawBanner();
+    };
+
+    // Image Preview Helper
+    function previewImages() {
+      const container = document.getElementById('imagePreviewContainer');
+      container.innerHTML = '';
+      uploadedImages = [];
+      currentCarouselIndex = 0;
+      
+      const files = document.getElementById('imageInput').files;
+      if (files.length === 0) {
+        document.getElementById('instagramMediaCanvas').style.display = 'block';
+        document.getElementById('canvasControls').style.display = 'block';
+        document.getElementById('instagramMediaImgContainer').style.display = 'none';
+        drawBanner();
+        return;
+      }
+
+      document.getElementById('instagramMediaCanvas').style.display = 'none';
+      document.getElementById('canvasControls').style.display = 'none';
+      document.getElementById('instagramMediaImgContainer').style.display = 'block';
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          uploadedImages.push(e.target.result);
+          
+          const img = document.createElement('img');
+          img.className = 'preview-img';
+          img.src = e.target.result;
+          container.appendChild(img);
+          
+          if (uploadedImages.length === files.length) {
+            updateInstagramCarousel();
+          }
+        }
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function updateInstagramCarousel() {
+      const imgEl = document.getElementById('instagramMediaImg');
+      const prevBtn = document.getElementById('carouselPrev');
+      const nextBtn = document.getElementById('carouselNext');
+      const dotsEl = document.getElementById('carouselDots');
+      
+      if (uploadedImages.length === 0) {
+        imgEl.src = '';
+        prevBtn.style.display = 'none';
+        nextBtn.style.display = 'none';
+        dotsEl.innerHTML = '';
+        return;
+      }
+      
+      imgEl.src = uploadedImages[currentCarouselIndex];
+      
+      if (uploadedImages.length > 1) {
+        prevBtn.style.display = 'flex';
+        nextBtn.style.display = 'flex';
+        
+        dotsEl.innerHTML = '';
+        uploadedImages.forEach((_, idx) => {
+          const dot = document.createElement('span');
+          dot.className = `carousel-dot ${idx === currentCarouselIndex ? 'active' : ''}`;
+          dot.onclick = () => {
+            currentCarouselIndex = idx;
+            updateInstagramCarousel();
+          };
+          dotsEl.appendChild(dot);
+        });
+      } else {
+        prevBtn.style.display = 'none';
+        nextBtn.style.display = 'none';
+        dotsEl.innerHTML = '';
+      }
+    }
+
+    function carouselMove(direction) {
+      currentCarouselIndex += direction;
+      if (currentCarouselIndex < 0) {
+        currentCarouselIndex = uploadedImages.length - 1;
+      } else if (currentCarouselIndex >= uploadedImages.length) {
+        currentCarouselIndex = 0;
+      }
+      updateInstagramCarousel();
+    }
+
+    // Banner Graphics functions
+    function setBannerTheme(theme) {
+      selectedTheme = theme;
+      document.querySelectorAll('.theme-dot').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.theme === theme);
+      });
+      drawBanner();
+    }
+
+    function updateBannerText(text) {
+      bannerText = text || 'Your Headline Overlay Here...';
+      drawBanner();
+    }
+
+    function downloadBanner() {
+      const canvas = document.getElementById('instagramMediaCanvas');
+      const link = document.createElement('a');
+      link.download = 'instagram_banner.png';
+      link.href = canvas.toDataURL();
+      link.click();
+    }
+
+    function drawBanner() {
+      const canvas = document.getElementById('instagramMediaCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width;
+      const h = canvas.height;
+      
+      // Draw gradients
+      let grad = ctx.createLinearGradient(0, 0, w, h);
+      if (selectedTheme === 'sunset') {
+        grad.addColorStop(0, '#f9ce34');
+        grad.addColorStop(0.5, '#ee2a7b');
+        grad.addColorStop(1, '#6228d7');
+      } else if (selectedTheme === 'space') {
+        grad.addColorStop(0, '#0f172a');
+        grad.addColorStop(1, '#1e1b4b');
+      } else if (selectedTheme === 'teal') {
+        grad.addColorStop(0, '#0d9488');
+        grad.addColorStop(1, '#0284c7');
+      } else if (selectedTheme === 'charcoal') {
+        grad.addColorStop(0, '#1e293b');
+        grad.addColorStop(1, '#0f172a');
+      }
+      
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, h);
+
+      // Soft design overlays
+      ctx.save();
+      ctx.globalAlpha = 0.15;
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(w * 0.8, h * 0.2, w * 0.4, 0, Math.PI * 2);
+      ctx.fill();
+      
+      ctx.beginPath();
+      ctx.arc(w * 0.15, h * 0.75, w * 0.35, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      // Draw text
+      ctx.fillStyle = bannerTextColor;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      
+      ctx.font = `700 ${bannerFontSize}px system-ui, -apple-system, sans-serif`;
+      const words = bannerText.split(' ');
+      let line = '';
+      const lines = [];
+      const maxWidth = w * 0.82;
+      const lineHeight = bannerFontSize * 1.4;
+      
+      for (let n = 0; n < words.length; n++) {
+        let testLine = line + words[n] + ' ';
+        let metrics = ctx.measureText(testLine);
+        let testWidth = metrics.width;
+        if (testWidth > maxWidth && n > 0) {
+          lines.push(line);
+          line = words[n] + ' ';
+        } else {
+          line = testLine;
+        }
+      }
+      lines.push(line);
+      
+      let startY = h / 2 - ((lines.length - 1) * lineHeight) / 2;
+      for (let i = 0; i < lines.length; i++) {
+        ctx.fillText(lines[i].trim(), w / 2, startY + (i * lineHeight));
+      }
+
+      // Watermark
+      ctx.save();
+      ctx.globalAlpha = 0.55;
+      ctx.font = '500 13px system-ui, -apple-system, sans-serif';
+      ctx.fillStyle = bannerTextColor;
+      const mockUsername = document.getElementById('mockUsernameInput').value || 'yourbrand';
+      ctx.fillText(`@${mockUsername}`, w / 2, h - 30);
+      ctx.restore();
+    }
+
+    // Editable Header binding
+    function updateMockHeader() {
+      const username = document.getElementById('mockUsernameInput').value || 'yourbrand';
+      document.getElementById('mockUsernameCaption').textContent = username;
+    }
+
+    function toggleMockLike() {
+      isMockLiked = !isMockLiked;
+      const icon = document.getElementById('likeIcon');
+      const countEl = document.getElementById('mockLikesText');
+      if (isMockLiked) {
+        icon.innerHTML = '❤️';
+        icon.style.color = '#ef4444';
+        countEl.innerHTML = 'Liked by <strong>you</strong> and 256 others';
+      } else {
+        icon.innerHTML = '🤍';
+        icon.style.color = '';
+        countEl.innerHTML = 'Liked by <strong>instagram_agent</strong> and 256 others';
+      }
+    }
+
+    // --- SaaS Authentication & User Session Logic ---
+    let currentUser = null;
+    let authToken = localStorage.getItem('agent_saas_token') || null;
+    let authMode = 'login';
+    let googleClientId = "";
+
+    // --- 3D Interactive Neon Tubes Background ---
+    let tubesApp = null;
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      initTubesBackground();
+      await fetchAuthConfig();
+      await checkGoogleOAuthCallback();
+      if (authToken) {
+        fetchUserProfile();
+      } else {
+        openAuthModal('signup');
+      }
+      loadHistory();
+    });
+
+    async function initTubesBackground() {
+      const canvas = document.getElementById('tubesCanvas');
+      if (!canvas) return;
+
+      try {
+        const module = await import('https://cdn.jsdelivr.net/npm/threejs-components@0.0.19/build/cursors/tubes1.min.js');
+        const TubesCursor = module.default;
+
+        tubesApp = TubesCursor(canvas, {
+          tubes: {
+            colors: ["#f967fb", "#53bc28", "#6958d5"],
+            lights: {
+              intensity: 200,
+              colors: ["#83f36e", "#fe8a2e", "#ff008a", "#60aed5"]
+            }
+          }
+        });
+
+        // Click to randomize neon colors on background click
+        window.addEventListener('click', (e) => {
+          if (e.target.tagName === 'BODY' || e.target.classList.contains('container') || e.target.tagName === 'HEADER') {
+            randomizeTubeColors();
+          }
+        });
+      } catch (err) {
+        console.warn("3D Tubes Background initialization fallback:", err);
+      }
+    }
+
+    function randomizeTubeColors() {
+      if (!tubesApp) return;
+      const randomColor = () => "#" + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
+      const colors = [randomColor(), randomColor(), randomColor()];
+      const lightsColors = [randomColor(), randomColor(), randomColor(), randomColor()];
+      
+      if (tubesApp.tubes && tubesApp.tubes.setColors) {
+        tubesApp.tubes.setColors(colors);
+        tubesApp.tubes.setLightsColors(lightsColors);
+      }
+    }
+
+    async function checkGoogleOAuthCallback() {
+      const hash = window.location.hash;
+      const search = window.location.search;
+      if (!hash && !search) return;
+
+      const params = new URLSearchParams(hash.startsWith('#') ? hash.substring(1) : (search.startsWith('?') ? search.substring(1) : search));
+      const accessToken = params.get('access_token');
+      const idToken = params.get('id_token');
+
+      if (!accessToken && !idToken) return;
+
+      // --- Replay guard: only process once per browser session ---
+      const callbackKey = 'postin_google_callback_token';
+      const tokenSignature = (accessToken || idToken || "").substring(0, 30);
+      const alreadyProcessed = sessionStorage.getItem(callbackKey);
+      if (alreadyProcessed === tokenSignature) {
+        // Already handled this exact callback token — clear URL and skip
+        window.history.replaceState({}, document.title, window.location.pathname);
+        return;
+      }
+      sessionStorage.setItem(callbackKey, tokenSignature);
+
+      // Immediately clear URL hash from address bar
+      window.history.replaceState({}, document.title, window.location.pathname);
+      showToast('🔄 Verifying Google Account authentication...', 'info');
+
+      try {
+        let email = "";
+        let fullName = "";
+        let avatarUrl = "";
+        let googleId = "";
+
+        if (accessToken) {
+          const googleUserRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+            headers: { 'Authorization': `Bearer ${accessToken}` }
+          });
+          if (!googleUserRes.ok) throw new Error('Failed to fetch Google profile. Access token may have expired.');
+          const googleUser = await googleUserRes.json();
+          email = googleUser.email || "";
+          fullName = googleUser.name || googleUser.given_name || (email ? email.split('@')[0] : "Google User");
+          avatarUrl = googleUser.picture || "";
+          googleId = googleUser.sub || "";
+
+          if (!email || !googleId) throw new Error('Google profile missing email or user ID.');
+        }
+
+        if (!email || !googleId) throw new Error('Google OAuth payload missing required fields.');
+
+        const res = await fetch('/api/auth?action=google', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            idToken: idToken || "",
+            googleId,
+            email,
+            fullName,
+            avatarUrl
+          })
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Google login failed');
+
+        authToken = data.token;
+        localStorage.setItem('agent_saas_token', authToken);
+        currentUser = data.user;
+
+        updateHeaderUserUI();
+        closeAuthModal();
+        loadHistory();
+        // Clear the replay guard once login is fully complete
+        sessionStorage.removeItem(callbackKey);
+        showToast('🎉 Google Sign-In Successful! Welcome to POSTIN.');
+      } catch (err) {
+        sessionStorage.removeItem(callbackKey);
+        showAuthError('Google Sign-In Error: ' + err.message);
+      }
+    }
+
+    async function fetchAuthConfig() {
+      try {
+        const res = await fetch('/api/auth?action=config');
+        if (res.ok) {
+          const data = await res.json();
+          googleClientId = data.googleClientId || "";
+          if (googleClientId && window.google && window.google.accounts) {
+            try {
+              google.accounts.id.initialize({
+                client_id: googleClientId,
+                callback: handleGoogleCredentialResponse
+              });
+            } catch (e) {
+              console.warn("Google SDK init warning:", e);
+            }
+          }
+        }
+      } catch (e) {
+        console.warn("Fetch auth config warning:", e);
+      }
+    }
+
+    function openAuthModal(mode = 'login') {
+      switchAuthMode(mode);
+      document.getElementById('authModal').style.display = 'flex';
+      const closeBtn = document.querySelector('#authModal .auth-modal-close');
+      if (closeBtn) closeBtn.style.display = currentUser ? 'block' : 'none';
+    }
+
+    function closeAuthModal() {
+      if (!currentUser) return; // Prevent closing if not authenticated
+      document.getElementById('authModal').style.display = 'none';
+    }
+
+    function showAuthError(msg) {
+      const alertEl = document.getElementById('authErrorAlert');
+      if (alertEl) {
+        alertEl.textContent = '⚠️ ' + msg;
+        alertEl.style.display = 'block';
+      }
+    }
+
+    function clearAuthError() {
+      const alertEl = document.getElementById('authErrorAlert');
+      if (alertEl) {
+        alertEl.textContent = '';
+        alertEl.style.display = 'none';
+      }
+    }
+
+    function togglePasswordVisibility() {
+      const pwdInput = document.getElementById('authPasswordInput');
+      if (pwdInput) {
+        pwdInput.type = pwdInput.type === 'password' ? 'text' : 'password';
+      }
+    }
+
+    function switchAuthMode(mode) {
+      authMode = mode;
+      clearAuthError();
+      const isSignup = mode === 'signup';
+      document.getElementById('tabBtnLogin').classList.toggle('active', !isSignup);
+      document.getElementById('tabBtnSignup').classList.toggle('active', isSignup);
+      document.getElementById('authModalTitle').textContent = isSignup ? 'Join POSTIN SaaS' : 'Welcome to POSTIN';
+      document.getElementById('authModalSubtitle').textContent = isSignup ? '🎁 Create a free account & get 10 trial tokens' : 'Sign in to access your AI Content Studio';
+      document.getElementById('authNameInput').style.display = isSignup ? 'block' : 'none';
+      document.getElementById('authSubmitBtn').textContent = isSignup ? '🚀 Create Free Account (10 Tokens)' : '⚡ Sign In to Studio';
+      document.getElementById('authToggleMsg').innerHTML = isSignup
+        ? `Already have an account? <a onclick="switchAuthMode('login')">Sign In</a>`
+        : `Don't have an account? <a onclick="switchAuthMode('signup')">Create Free Account</a>`;
+    }
+
+    async function handleAuthSubmit(event) {
+      event.preventDefault();
+      clearAuthError();
+      const email = document.getElementById('authEmailInput').value.trim();
+      const password = document.getElementById('authPasswordInput').value;
+      const fullName = document.getElementById('authNameInput').value.trim();
+      const submitBtn = document.getElementById('authSubmitBtn');
+
+      if (!email || !password) {
+        showAuthError('Email and password are required.');
+        return;
+      }
+      if (authMode === 'signup' && password.length < 6) {
+        showAuthError('Password must be at least 6 characters long.');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = authMode === 'signup' ? '🚀 Creating Account...' : '⚡ Signing In...';
+
+      try {
+        const endpoint = `/api/auth?action=${authMode}`;
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password, fullName })
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Authentication failed');
+
+        authToken = data.token;
+        localStorage.setItem('agent_saas_token', authToken);
+        currentUser = data.user;
+        updateHeaderUserUI();
+        closeAuthModal();
+        loadHistory();
+        showToast(authMode === 'signup' ? '🎉 Welcome! Account created with 10 Free Tokens.' : '✨ Welcome back to POSTIN Studio!');
+      } catch (err) {
+        showAuthError(err.message);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = authMode === 'signup' ? '🚀 Create Free Account (10 Tokens)' : '⚡ Sign In to Studio';
+      }
+    }
+
+    async function fetchAuthConfig() {
+      try {
+        const res = await fetch('/api/auth?action=config');
+        if (res.ok) {
+          const data = await res.json();
+          googleClientId = data.googleClientId || "";
+          if (googleClientId && window.google && window.google.accounts) {
+            initGoogleIdentitySDK();
+          }
+        }
+      } catch (e) {
+        console.warn("Fetch auth config warning:", e);
+      }
+    }
+
+    function initGoogleIdentitySDK() {
+      if (!googleClientId || !window.google || !window.google.accounts || !window.google.accounts.id) return;
+      try {
+        google.accounts.id.initialize({
+          client_id: googleClientId,
+          callback: handleGoogleCredentialResponse,
+          auto_select: false
+        });
+      } catch (e) {
+        console.warn("Google SDK init warning:", e);
+      }
+    }
+
+    async function handleGoogleSignIn() {
+      clearAuthError();
+      if (!googleClientId) {
+        await fetchAuthConfig();
+      }
+
+      if (!googleClientId || googleClientId.trim() === '') {
+        showAuthError("Google OAuth 2.0 requires adding GOOGLE_CLIENT_ID to your .env file.");
+        return;
+      }
+      
+      if (window.google && window.google.accounts && window.google.accounts.id) {
+        try {
+          google.accounts.id.initialize({
+            client_id: googleClientId,
+            callback: handleGoogleCredentialResponse
+          });
+          
+          // Render Google One-Tap / Identity prompt
+          google.accounts.id.prompt((notification) => {
+            if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+              redirectToGoogleOAuthScreen(googleClientId);
+            }
+          });
+          return;
+        } catch (e) {
+          console.warn("Google SDK prompt error:", e);
+        }
+      }
+      
+      redirectToGoogleOAuthScreen(googleClientId);
+    }
+
+    function redirectToGoogleOAuthScreen(clientId) {
+      if (!clientId || clientId.trim() === '') {
+        showAuthError("Google OAuth 2.0 requires adding GOOGLE_CLIENT_ID to your .env file.");
+        return;
+      }
+
+      // Format origin without trailing slash for Google Cloud Console URI matching
+      const cleanOrigin = window.location.origin.replace(/\/$/, '');
+      const scope = "email profile";
+      const redirectUri = encodeURIComponent(cleanOrigin);
+      
+      showToast('Redirecting to Google Accounts Authentication...', 'info');
+
+      // Google OAuth 2.0 Implicit Grant Flow
+      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=token&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}`;
+      
+      window.location.href = authUrl;
+    }
+
+    async function handleGoogleCredentialResponse(response) {
+      if (!response || !response.credential) return;
+      try {
+        const res = await fetch('/api/auth?action=google', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ idToken: response.credential })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+
+        authToken = data.token;
+        localStorage.setItem('agent_saas_token', authToken);
+        currentUser = data.user;
+        updateHeaderUserUI();
+        closeAuthModal();
+        loadHistory();
+        showToast('✨ Signed in successfully via Google OAuth 2.0!');
+      } catch (err) {
+        showAuthError('Google OAuth Error: ' + err.message);
+      }
+    }
+
+    async function fetchUserProfile() {
+      if (!authToken) return;
+      try {
+        const res = await fetch('/api/auth?action=me', {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          currentUser = data.user;
+          updateHeaderUserUI();
+          document.getElementById('authModal').style.display = 'none';
+        } else {
+          logout();
+        }
+      } catch (e) {
+        console.error('Fetch profile error:', e);
+      }
+    }
+
+    function updateHeaderUserUI() {
+      const area = document.getElementById('headerAuthArea');
+      if (currentUser) {
+        const displayName = currentUser.full_name || currentUser.email.split('@')[0];
+        const avatarUrl = currentUser.avatar_url || '';
+        const initial = displayName.charAt(0).toUpperCase();
+
+        const avatarHtml = avatarUrl
+          ? `<img src="${avatarUrl}" alt="avatar" style="width:26px;height:26px;border-radius:50%;object-fit:cover;border:2px solid rgba(238,42,123,0.6);flex-shrink:0;">`
+          : `<span style="width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--primary-start),var(--primary-end));display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:white;flex-shrink:0;">${initial}</span>`;
+
+        area.innerHTML = `
+          <div class="auth-user-badge">
+            <button class="btn-topup-header" onclick="openRechargeModal()">⚡ Buy Tokens (₹)</button>
+            <span class="credits-pill" onclick="openProfileModal()" title="Click to view profile & tokens">⚡ ${currentUser.credits_remaining ?? 10} Tokens</span>
+            <button class="btn-user-prof" onclick="openProfileModal()" style="display:flex;align-items:center;gap:6px;">
+              ${avatarHtml}
+              <span style="max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${displayName}</span>
+            </button>
+          </div>
+        `;
+      } else {
+        area.innerHTML = `<button class="btn-auth" onclick="openAuthModal('login')">🔑 Sign In / Register</button>`;
+      }
+    }
+
+    function openProfileModal() {
+      if (!currentUser) return;
+
+      const displayName = currentUser.full_name || currentUser.email?.split('@')[0] || 'Creator User';
+      const email = currentUser.email || '';
+      const avatarUrl = currentUser.avatar_url || '';
+      const tier = (currentUser.subscription_status || 'FREE TIER').toUpperCase();
+      const tokens = currentUser.credits_remaining ?? 10;
+
+      // Populate header avatar + name
+      document.getElementById('profNameHeader').textContent = displayName;
+      document.getElementById('profEmailHeader').textContent = email;
+      document.getElementById('profPlanBadge').textContent = tier;
+
+      // Avatar: show image if available, otherwise show initials
+      const imgEl = document.getElementById('profAvatarImg');
+      const initialsEl = document.getElementById('profAvatarInitials');
+      if (avatarUrl) {
+        imgEl.src = avatarUrl;
+        imgEl.style.display = 'block';
+        initialsEl.style.display = 'none';
+      } else {
+        imgEl.style.display = 'none';
+        initialsEl.style.display = 'flex';
+        initialsEl.textContent = displayName.charAt(0).toUpperCase();
+      }
+
+      // Populate details card
+      document.getElementById('profName').textContent = displayName;
+      document.getElementById('profEmail').textContent = email;
+      document.getElementById('profPlan').textContent = tier;
+      document.getElementById('profTokens').textContent = `⚡ ${tokens} Tokens`;
+
+      document.getElementById('profileModal').style.display = 'flex';
+    }
+
+    function closeProfileModal() {
+      document.getElementById('profileModal').style.display = 'none';
+    }
+
+    function openRechargeModal() {
+      if (!currentUser) {
+        openAuthModal('login');
+        return;
+      }
+      document.getElementById('rechargeModal').style.display = 'flex';
+    }
+
+    function closeRechargeModal() {
+      document.getElementById('rechargeModal').style.display = 'none';
+    }
+
+    async function buyTokenPackage(packageKey) {
+      if (!authToken) {
+        openAuthModal('login');
+        return;
+      }
+      try {
+        // 1. Create Razorpay Order
+        const res = await fetch('/api/billing/create-order', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`
+          },
+          body: JSON.stringify({ packageKey })
+        });
+        const orderData = await res.json();
+        if (!res.ok) throw new Error(orderData.error || 'Failed to create payment order');
+
+        // Fallback simulation mode if Razorpay credentials are not configured or SDK is unavailable
+        if (orderData.isTestMode || typeof Razorpay === 'undefined') {
+          const verifyRes = await fetch('/api/billing/verify-payment', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify({ packageKey })
+          });
+          const verifyData = await verifyRes.json();
+          if (!verifyRes.ok) throw new Error(verifyData.error);
+
+          if (verifyData.user) {
+            currentUser = verifyData.user;
+            updateHeaderUserUI();
+          }
+          showToast(`🎉 RECHARGE VERIFIED! Status: ${currentUser.subscription_status || 'PRO TIER'} | Balance: ${currentUser.credits_remaining} Tokens!`);
+          closeRechargeModal();
+          openProfileModal();
+          return;
+        }
+
+        // 2. Launch Official Razorpay Standard Checkout SDK
+        const options = {
+          key: orderData.keyId,
+          amount: orderData.amount,
+          currency: orderData.currency,
+          name: "POSTIN SaaS Content Studio",
+          description: `${orderData.package.name} - ${orderData.package.tokens} Tokens`,
+          order_id: orderData.orderId,
+          prefill: {
+            email: currentUser.email,
+            name: currentUser.full_name || ""
+          },
+          theme: {
+            color: "#ee2a7b"
+          },
+          handler: async function (response) {
+            try {
+              const verifyRes = await fetch('/api/billing/verify-payment', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${authToken}`
+                },
+                body: JSON.stringify({
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_signature: response.razorpay_signature,
+                  packageKey
+                })
+              });
+              const verifyData = await verifyRes.json();
+              if (!verifyRes.ok) throw new Error(verifyData.error);
+
+              if (verifyData.user) {
+                currentUser = verifyData.user;
+                updateHeaderUserUI();
+              }
+              showToast(`🎉 RECHARGE VERIFIED! Status: ${currentUser.subscription_status || 'PRO TIER'} | Balance: ${currentUser.credits_remaining} Tokens!`);
+              closeRechargeModal();
+              openProfileModal();
+            } catch (e) {
+              showToast('Payment Verification Error: ' + e.message, 'error');
+            }
+          }
+        };
+
+        const rzp = new Razorpay(options);
+        rzp.open();
+      } catch (err) {
+        alert('Recharge Error: ' + err.message);
+      }
+    }
+
+    function logout() {
+      authToken = null;
+      currentUser = null;
+      localStorage.removeItem('agent_saas_token');
+      updateHeaderUserUI();
+      openAuthModal('login');
+    }
+
+    // Draft History integrations
+    async function loadHistory() {
+      try {
+        const headers = {};
+        if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
+        const res = await fetch('/api/history', { headers });
+        if (!res.ok) throw new Error('Failed to load drafts');
+        const drafts = await res.json();
+        renderDraftsList(drafts);
+      } catch (err) {
+        console.error('History load error:', err);
+      }
+    }
+
+    function renderDraftsList(drafts) {
+      const container = document.getElementById('draftsLibrary');
+      if (!Array.isArray(drafts) || drafts.length === 0) {
+        container.innerHTML = `<div class="draft-empty-msg">${authToken ? 'No saved drafts yet.' : 'Sign in to save and access your post library.'}</div>`;
+        return;
+      }
+      
+      container.innerHTML = '';
+      drafts.forEach(d => {
+        const date = new Date(d.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        const shortTopic = d.topic.length > 35 ? d.topic.slice(0, 35) + '...' : d.topic;
+        
+        const card = document.createElement('div');
+        card.className = 'draft-item-card';
+        card.onclick = () => loadDraft(d);
+        
+        card.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 5px;">
+            <div class="draft-title" style="font-weight: 700; font-size: 13px; color: white;">${shortTopic || 'Untitled Draft'}</div>
+            <button class="btn-delete-draft" style="background:none; border:none; color: var(--text-muted); cursor:pointer; font-size:12px;">✕</button>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-top: 5px;">
+            <span>Tone: ${d.tone}</span>
+            <span>${date}</span>
+          </div>
+        `;
+
+        const delBtn = card.querySelector('.btn-delete-draft');
+        delBtn.onclick = (e) => {
+          e.stopPropagation();
+          deleteDraft(d.id);
+        };
+
+        container.appendChild(card);
+      });
+    }
+
+    async function saveCurrentDraft() {
+      if (!generatedData) return;
+      if (!authToken) {
+        openAuthModal('login');
+        return;
+      }
+      if (generatedData.isSaved) {
+        alert('This draft is already saved in your history library!');
+        return;
+      }
+      try {
+        const res = await fetch('/api/history', {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`
+          },
+          body: JSON.stringify({
+            topic: generatedData.topic,
+            tone: activeTone,
+            captions: generatedData.captions,
+            hashtags: generatedData.hashtags,
+            visualPrompt: generatedData.visualPrompt,
+            altText: generatedData.altText || '',
+            audienceSchedule: generatedData.audienceSchedule || null,
+            qaFeedback: generatedData.qaFeedback,
+            images: generatedData.images || []
+          })
+        });
+        const r = await res.json();
+        if (!res.ok) throw new Error(r.error);
+        if (r.draft && r.draft.id) {
+          generatedData.id = r.draft.id;
+        }
+        generatedData.isSaved = true;
+        alert('Draft saved to history successfully!');
+        loadHistory();
+      } catch (err) {
+        alert('Save failed: ' + err.message);
+      }
+    }
+
+    async function deleteDraft(id) {
+      if (!confirm('Are you sure you want to delete this draft?')) return;
+      if (!id || id === 'undefined' || id === 'null') {
+        loadHistory();
+        return;
+      }
+      try {
+        const headers = {};
+        if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
+        const res = await fetch(`/api/history?id=${encodeURIComponent(id)}`, { method: 'DELETE', headers });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Delete request failed');
+        loadHistory();
+      } catch (err) {
+        alert('Delete failed: ' + err.message);
+      }
+    }
+
+    function loadDraft(draft) {
+      generatedData = draft;
+      generatedData.isSaved = true;
+      
+      activeTone = draft.tone;
+      document.querySelectorAll('.tone-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('onclick').includes(draft.tone));
+      });
+      
+      document.getElementById('topic').value = draft.topic;
+      document.getElementById('imagePreviewContainer').innerHTML = '';
+      document.getElementById('imageInput').value = '';
+      
+      // Load into carousel or canvas preview
+      if (draft.images && Array.isArray(draft.images) && draft.images.length > 0) {
+        uploadedImages = draft.images;
+        currentCarouselIndex = 0;
+        document.getElementById('instagramMediaCanvas').style.display = 'none';
+        document.getElementById('canvasControls').style.display = 'none';
+        document.getElementById('instagramMediaImgContainer').style.display = 'block';
+        updateInstagramCarousel();
+      } else {
+        document.getElementById('instagramMediaCanvas').style.display = 'block';
+        document.getElementById('canvasControls').style.display = 'block';
+        document.getElementById('instagramMediaImgContainer').style.display = 'none';
+        document.getElementById('canvasText').value = draft.topic;
+        bannerText = draft.topic;
+        drawBanner();
+      }
+      
+      renderOutputs(draft);
+      
+      document.getElementById('idleState').style.display = 'none';
+      document.getElementById('outputState').style.display = 'flex';
+      document.getElementById('saveDraftContainer').style.display = 'flex';
+      
+      switchTab('captions');
+      
+      resetAgentTrace();
+      const agents = ['analyst', 'altText', 'writer', 'strategist', 'planner', 'schedulePlanner', 'verifier'];
+      agents.forEach(a => {
+        setAgentState(a, 'done', 'Loaded', 'Draft loaded successfully.');
+      });
+    }
+
+    function setTone(tone, btn) {
+      activeTone = tone;
+      document.querySelectorAll('.tone-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      
+      document.getElementById(`tabBtn-${tabId}`).classList.add('active');
+      document.getElementById(`tab-${tabId}`).classList.add('active');
+    }
+
+    // Helper to compress and convert File to Base64 JPEG for fast upload
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const MAX_DIM = 1024;
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height) {
+              if (width > MAX_DIM) {
+                height = Math.round((height * MAX_DIM) / width);
+                width = MAX_DIM;
+              }
+            } else {
+              if (height > MAX_DIM) {
+                width = Math.round((width * MAX_DIM) / height);
+                height = MAX_DIM;
+              }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+            const base64Data = dataUrl.split(',')[1];
+            resolve({ data: base64Data, mimeType: 'image/jpeg' });
+          };
+          img.onerror = () => {
+            const base64Data = e.target.result.split(',')[1];
+            resolve({ data: base64Data, mimeType: file.type || 'image/jpeg' });
+          };
+          img.src = e.target.result;
+        };
+        reader.onerror = error => reject(error);
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function generatePostAssets() {
+      const topic = document.getElementById('topic').value.trim();
+      const files = document.getElementById('imageInput').files;
+      const generateBtn = document.getElementById('generateBtn');
+      const idleState = document.getElementById('idleState');
+      const outputState = document.getElementById('outputState');
+
+      if (!topic && files.length === 0) {
+        alert('Please enter a description or upload at least one image.');
+        return;
+      }
+
+      generateBtn.disabled = true;
+      idleState.style.display = 'block';
+      idleState.textContent = 'Orchestrating AI agents in parallel...';
+      outputState.style.display = 'none';
+      document.getElementById('saveDraftContainer').style.display = 'none';
+      document.getElementById('topicDetails').style.display = 'none';
+      resetAgentTrace();
+
+      // Convert files to base64 for memory upload
+      const imageParts = [];
+      for (let i = 0; i < files.length; i++) {
+        const part = await fileToBase64(files[i]);
+        imageParts.push(part);
+      }
+
+      let isFetching = true;
+      const runStepProgressAnimation = async () => {
+        setAgentState('analyst', 'active', 'Analyzing... <div class="spinner"></div>', 'Extracting image subjects & topic...');
+        await sleep(1200);
+        if (!isFetching) return;
+        setAgentState('analyst', 'done', 'Done', files.length > 0 ? 'Image analyzed successfully.' : 'Text prompt loaded.');
+
+        setAgentState('altText', 'active', 'Writing... <div class="spinner"></div>', 'Drafting accessibility alt text...');
+        setAgentState('writer', 'active', 'Writing... <div class="spinner"></div>', 'Drafting 3 caption options...');
+        setAgentState('planner', 'active', 'Planning... <div class="spinner"></div>', 'Designing visual scene prompt...');
+        await sleep(2000);
+        if (!isFetching) return;
+        setAgentState('altText', 'done', 'Done', files.length > 0 ? 'Alt text mapped.' : 'Skipped (no image).');
+        setAgentState('writer', 'done', 'Done', '3 caption variations drafted.');
+        setAgentState('planner', 'done', 'Done', 'Visual scene designed.');
+
+        setAgentState('strategist', 'active', 'Selecting... <div class="spinner"></div>', 'Selecting 15 target hashtags...');
+        setAgentState('schedulePlanner', 'active', 'Analyzing... <div class="spinner"></div>', 'Calculating best posting time...');
+        setAgentState('verifier', 'active', 'Verifying... <div class="spinner"></div>', 'Evaluating QA engagement score...');
+      };
+
+      try {
+        const headers = { 'Content-Type': 'application/json' };
+        if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
+
+        runStepProgressAnimation();
+
+        const res = await fetch('/api/generate', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            topic,
+            tone: activeTone,
+            imageParts
+          })
+        });
+
+        const data = await res.json();
+        isFetching = false;
+
+        if (!res.ok) throw new Error(data.error || 'Generation failed');
+
+        generatedData = data;
+        if (authToken) fetchUserProfile(); // Refresh credit count
+
+        // Mark all agents completed
+        const agents = ['analyst', 'altText', 'writer', 'strategist', 'planner', 'schedulePlanner', 'verifier'];
+        agents.forEach(a => setAgentState(a, 'done', 'Done', 'Agent task completed successfully.'));
+
+        renderOutputs(data);
+
+        idleState.style.display = 'none';
+        outputState.style.display = 'flex';
+        document.getElementById('saveDraftContainer').style.display = 'flex';
+        switchTab('captions');
+
+      } catch (err) {
+        isFetching = false;
+        alert('Workflow generation failed: ' + err.message);
+        idleState.textContent = 'Generation failed: ' + err.message;
+      } finally {
+        generateBtn.disabled = false;
+      }
+    }
+
+    function renderOutputs(data) {
+      document.getElementById('extractedTopicText').textContent = data.topic;
+      document.getElementById('topicDetails').style.display = 'block';
+
+      // 1. Render Captions
+      const captionsList = document.getElementById('captionsList');
+      captionsList.innerHTML = '';
+      data.captions.forEach((c, idx) => {
+        captionsList.innerHTML += `
+          <div class="caption-card" id="captionCard-${idx}" onclick="selectCaption(${idx})" style="cursor: pointer;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div class="caption-meta">${c.style}</div>
+              <span class="preview-active-badge" id="previewBadge-${idx}" style="font-size: 10px; color: var(--text-muted); font-weight: bold;"></span>
+            </div>
+            <div class="caption-text" id="capText-${idx}">${c.text}</div>
+            <button class="btn-copy" onclick="event.stopPropagation(); copyText(document.getElementById('capText-${idx}').textContent)">📋 Copy Caption</button>
+          </div>`;
+      });
+
+      // 2. Render Hashtags
+      renderHashtagList('hashtagsBroad', data.hashtags.broad);
+      renderHashtagList('hashtagsNiche', data.hashtags.niche);
+      renderHashtagList('hashtagsCustom', data.hashtags.custom);
+
+      // 3. Render Visual & Alt Text
+      document.getElementById('visualPromptText').textContent = data.visualPrompt;
+      document.getElementById('altTextText').textContent = data.altText || "No image description generated.";
+      
+      const mockAltTextEl = document.getElementById('mockAltBadgeText');
+      const mockAltBadge = document.getElementById('mockAltBadge');
+      if (data.altText && data.altText !== "No image uploaded." && data.altText !== "Error generating alt text description.") {
+        mockAltTextEl.textContent = data.altText;
+        mockAltBadge.style.display = 'block';
+      } else {
+        mockAltBadge.style.display = 'none';
+      }
+
+      // 4. Render Posting Strategy
+      if (data.audienceSchedule) {
+        document.getElementById('strategyAudience').textContent = data.audienceSchedule.targetAudience || 'General Audience';
+        document.getElementById('strategyTime').textContent = data.audienceSchedule.bestTime || 'Anytime';
+        document.getElementById('strategyType').textContent = data.audienceSchedule.postType || 'Single Feed Post';
+      }
+
+      // 5. Render QA Verification
+      document.getElementById('qaScore').textContent = data.qaFeedback.score;
+      const tipsDiv = document.getElementById('qaTips');
+      tipsDiv.innerHTML = formatMarkdownTips(data.qaFeedback.tips);
+
+      selectCaption(0);
+    }
+
+    function selectCaption(idx) {
+      if (!generatedData || !generatedData.captions || !generatedData.captions[idx]) return;
+      
+      document.querySelectorAll('.caption-card').forEach(card => card.classList.remove('active-caption-card'));
+      document.querySelectorAll('.preview-active-badge').forEach((badge, index) => {
+        badge.textContent = index === idx ? '👉 Active in Preview' : 'Click to preview';
+      });
+      
+      const selectedCard = document.getElementById(`captionCard-${idx}`);
+      if (selectedCard) selectedCard.classList.add('active-caption-card');
+      
+      const captionText = generatedData.captions[idx].text;
+      
+      const allTags = [
+        ...(generatedData.hashtags.broad || []),
+        ...(generatedData.hashtags.niche || []),
+        ...(generatedData.hashtags.custom || [])
+      ].join(' ');
+      
+      const fullPostText = captionText + '\n\n' + allTags;
+      renderTruncatedCaption(fullPostText);
+    }
+
+    function renderTruncatedCaption(text) {
+      currentCaptionFullText = text;
+      isCaptionExpanded = false;
+      
+      const limit = 110;
+      const displayEl = document.getElementById('mockCaptionRendered');
+      const moreBtn = document.getElementById('captionMoreBtn');
+      
+      if (text.length > limit) {
+        displayEl.textContent = text.slice(0, limit) + '...';
+        moreBtn.style.display = 'inline';
+      } else {
+        displayEl.textContent = text;
+        moreBtn.style.display = 'none';
+      }
+    }
+
+    function expandMockCaption() {
+      document.getElementById('mockCaptionRendered').textContent = currentCaptionFullText;
+      document.getElementById('captionMoreBtn').style.display = 'none';
+      isCaptionExpanded = true;
+    }
+
+    function renderHashtagList(elementId, list) {
+      const el = document.getElementById(elementId);
+      el.innerHTML = '';
+      if (!list) return;
+      list.forEach(tag => {
+        el.innerHTML += `<span class="hashtag-tag">${tag}</span>`;
+      });
+    }
+
+    function resetAgentTrace() {
+      const agents = ['analyst', 'altText', 'writer', 'strategist', 'planner', 'schedulePlanner', 'verifier'];
+      agents.forEach(a => {
+        document.getElementById(`step-${a}`).className = 'agent-step';
+        document.getElementById(`status-${a}`).textContent = 'Idle';
+        document.getElementById(`msg-${a}`).textContent = 'Waiting for process trigger...';
+      });
+    }
+
+    function setAgentState(agentId, className, statusText, msgText) {
+      document.getElementById(`step-${agentId}`).className = `agent-step ${className}`;
+      document.getElementById(`status-${agentId}`).innerHTML = statusText;
+      document.getElementById(`msg-${agentId}`).textContent = msgText;
+    }
+
+    function showToast(message, type = 'success') {
+      let container = document.getElementById('toastContainer');
+      if (!container) {
+        container = document.createElement('div');
+        container.id = 'toastContainer';
+        container.className = 'toast-container';
+        document.body.appendChild(container);
+      }
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.innerHTML = `${type === 'success' ? '✨' : 'ℹ️'} <span>${message}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        if (toast.parentNode) toast.parentNode.removeChild(toast);
+      }, 3000);
+    }
+
+    function copyText(text) {
+      navigator.clipboard.writeText(text);
+      showToast('Copied to clipboard!');
+    }
+
+    function copyAllHashtags() {
+      if (!generatedData) return;
+      const allTags = [
+        ...generatedData.hashtags.broad,
+        ...generatedData.hashtags.niche,
+        ...generatedData.hashtags.custom
+      ].join(' ');
+      copyText(allTags);
+    }
+
+    function copyCategoryHashtags(elementId) {
+      const el = document.getElementById(elementId);
+      const tags = Array.from(el.querySelectorAll('.hashtag-tag')).map(t => t.textContent).join(' ');
+      copyText(tags);
+    }
+
+    function formatMarkdownTips(tipsMarkdown) {
+      let lines = tipsMarkdown.split('\n');
+      let html = '<ul>';
+      lines.forEach(line => {
+        line = line.trim();
+        if (line.startsWith('*') || line.startsWith('-')) {
+          html += `<li>${line.substring(1).trim()}</li>`;
+        } else if (line.length > 0) {
+          html += `<li>${line}</li>`;
+        }
+      });
+      html += '</ul>';
+      return html;
+    }
+
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    function switchMobileNav(tab) {
+      document.querySelectorAll('.mobile-nav-item').forEach(el => el.classList.remove('active'));
+      const activeBtn = document.getElementById(`mobileNav${tab.charAt(0).toUpperCase() + tab.slice(1)}`);
+      if (activeBtn) activeBtn.classList.add('active');
+
+      if (tab === 'create') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else if (tab === 'drafts') {
+        const draftsEl = document.getElementById('draftsLibrary');
+        if (draftsEl) draftsEl.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  </script>
+
+  <!-- Mobile Bottom Navigation Bar (Smartphones) -->
+  <nav class="mobile-bottom-nav">
+    <button class="mobile-nav-item active" onclick="switchMobileNav('create')" id="mobileNavCreate">
+      <span class="nav-icon">✨</span>
+      <span>Create</span>
+    </button>
+    <button class="mobile-nav-item" onclick="switchMobileNav('drafts')" id="mobileNavDrafts">
+      <span class="nav-icon">📁</span>
+      <span>Drafts</span>
+    </button>
+    <button class="mobile-nav-item" onclick="openRechargeModal()" id="mobileNavRecharge">
+      <span class="nav-icon">⚡</span>
+      <span>Tokens</span>
+    </button>
+    <button class="mobile-nav-item" onclick="openProfileModal()" id="mobileNavProfile">
+      <span class="nav-icon">👤</span>
+      <span>Account</span>
+    </button>
+  </nav>
+</body>
+
+</html>
