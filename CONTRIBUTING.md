@@ -1,5 +1,5 @@
 ---
-### File 2: `CONTRIBUTING.md` (Root or `.github/` folder)
+### `CONTRIBUTING.md` (Root or `.github/` folder)
 
 
 
