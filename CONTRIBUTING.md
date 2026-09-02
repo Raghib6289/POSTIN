@@ -2,11 +2,6 @@
 ### File 2: `CONTRIBUTING.md` (Root or `.github/` folder)
 
 
-# Contributing to Instagram Caption Agent
-
-First of all, thank you for taking the time to contribute! Open source projects thrive when people like you step in to improve them.
-
----
 
 ## Code of Conduct
 
