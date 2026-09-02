@@ -1,7 +1,7 @@
 ---
+### File 2: `CONTRIBUTING.md` (Root or `.github/` folder)
 
-### `CONTRIBUTING.md`
-
+Create a file named `CONTRIBUTING.md` and paste this directly (starting with the `#` heading, **no** `---` at line 1):
 ```markdown
 # Contributing to Instagram Caption Agent
 
