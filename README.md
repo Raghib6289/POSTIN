@@ -131,4 +131,4 @@ Check the open issues or submit a new proposal.
 Review our Code of Conduct.
 
 📄 License
-Distributed under the MIT License.
+Distributed under the GPLv3 License.
