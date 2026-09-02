@@ -1,59 +1,134 @@
-# ⚡ Instagram Caption Agent SaaS
+Markdown
+# ⚡ Instagram Caption Agent
 
-A multi-agent AI social media creative suite powered by **LangGraph**, **Gemini Vision**, **Neon PostgreSQL**, and **Vercel Serverless Functions**.
+An open-source multi-agent social media creative engine that analyzes visual content and generates targeted Instagram captions, hashtag strategies, and post hooks. Built with LangGraph, Gemini Vision, Neon PostgreSQL, and Next.js/Node.js serverless functions.
 
 ---
 
-## 🛠️ SaaS Setup Instructions
+## 📖 Table of Contents
 
-### 1. Database Setup (Neon PostgreSQL)
-1. Go to [Neon.tech](https://neon.tech) and create a free PostgreSQL project.
-2. Open the **SQL Editor** in your Neon dashboard.
-3. Run the SQL script from [`schema.sql`](file:///e:/instagram-caption-agent/schema.sql) to create the `users` and `posts` tables.
-4. Copy your database connection string (e.g., `postgres://alex:secret@ep-cool-db.neon.tech/neondb?sslmode=require`).
+- [Features](#-features)
+- [Tech Stack](#-tech-stack)
+- [Prerequisites](#-prerequisites)
+- [Getting Started](#-getting-started)
+  - [1. Clone Repository](#1-clone-repository)
+  - [2. Database Setup](#2-database-setup)
+  - [3. Environment Variables](#3-environment-variables)
+  - [4. Install & Run](#4-install--run)
+- [Deployment](#-deployment)
+- [Roadmap](#-roadmap)
+- [Contributing](#-contributing)
+- [License](#-license)
 
-### 2. Local Environment Configuration
-Create or edit your `.env` file:
-```env
-GEMINI_API_KEY=your_gemini_api_key_here
-DATABASE_URL=postgres://user:password@ep-xxxx.neon.tech/neondb?sslmode=require
-JWT_SECRET=your_super_secret_jwt_key
-```
+---
 
-### 3. Run Locally
+## ✨ Features
+
+- **Visual Understanding:** Evaluates images using Google Gemini Vision to understand tone, subjects, context, and aesthetic composition.
+- **Multi-Agent Orchestration:** Uses LangGraph workflows to divide work across specialized agents (Context Analyzer, Caption Writer, Hashtag Strategist, and Hook Specialist).
+- **In-Memory Image Parsing:** Base64 zero-disk image processing designed for serverless scalability.
+- **History & Drafts:** PostgreSQL integration for persisting user drafts, generated hooks, and performance metadata.
+- **Built-in Auth & Limits:** Ready-to-use user authentication and credit quota management.
+
+---
+
+## 🛠️ Tech Stack
+
+- **Workflow Orchestration:** [LangGraph](https://langchain-ai.github.io/langgraph/)
+- **Vision & LLM:** Google Gemini Flash / Pro Vision via `@google/generative-ai`
+- **Database:** [Neon PostgreSQL](https://neon.tech/) (Serverless Postgres)
+- **Runtime:** Node.js / Vercel Serverless Functions
+- **Authentication:** JWT & OAuth providers
+
+---
+
+## 📋 Prerequisites
+
+Ensure you have the following installed and set up:
+
+- [Node.js](https://nodejs.org/) (v18.x or higher)
+- [npm](https://www.npmjs.com/) or [pnpm](https://pnpm.io/)
+- A free [Neon](https://neon.tech/) account
+- A [Google AI Studio](https://aistudio.google.com/) API Key
+
+---
+
+## 🚀 Getting Started
+
+### 1. Clone Repository
+
 ```bash
+git clone [https://github.com/YOUR_USERNAME/instagram-caption-agent.git](https://github.com/YOUR_USERNAME/instagram-caption-agent.git)
+cd instagram-caption-agent
+2. Database Setup
+Log into your Neon Dashboard and create a new project.
+
+Navigate to the SQL Editor tab.
+
+Paste and execute the contents of schema.sql to initialize the required tables (users, posts, etc.).
+
+Copy your database connection string with SSL enabled:
+
+Plaintext
+postgres://[user]:[password]@[endpoint].neon.tech/[dbname]?sslmode=require
+3. Environment Variables
+Duplicate .env.example into .env:
+
+Bash
+cp .env.example .env
+Populate the required secrets:
+
+Code snippet
+# Google Gemini API
+GEMINI_API_KEY=your_gemini_api_key_here
+
+# Database
+DATABASE_URL=postgres://user:password@ep-xxxx.neon.tech/neondb?sslmode=require
+
+# Authentication
+JWT_SECRET=your_random_generated_jwt_secret
+4. Install & Run
+Bash
+# Install dependencies
 npm install
-npm start
-```
-Open `http://localhost:3000` in your browser.
 
----
+# Start development server
+npm run dev # or npm start
+Visit http://localhost:3000 to interact with the local development instance.
 
-## 🚀 Deploying to Vercel via GitHub
+🌐 Deployment
+Deploy to Vercel
+Push your repository to GitHub.
 
-1. **Push your code to GitHub**:
-   ```bash
-   git init
-   git add .
-   git commit -m "Initial commit: SaaS Instagram Agent with Auth & Neon DB"
-   git branch -M main
-   git remote add origin https://github.com/YOUR_USERNAME/instagram-caption-agent.git
-   git push -u origin main
-   ```
+Import the project into the Vercel Dashboard.
 
-2. **Connect to Vercel**:
-   - Go to your [Vercel Dashboard](https://vercel.com/new).
-   - Click **Import Project** and select your GitHub repository `instagram-caption-agent`.
-   - In the **Environment Variables** section, add:
-     - `GEMINI_API_KEY`: Your Gemini API Key
-     - `DATABASE_URL`: Your Neon PostgreSQL Connection String
-     - `JWT_SECRET`: Secret key for session authentication
-   - Click **Deploy**.
+Under Project Settings → Environment Variables, add:
 
----
+GEMINI_API_KEY
 
-## 🔒 Built-in SaaS Features
-- **User Authentication**: Email/Password Sign in + Google Account integration.
-- **Credit Balance Guard**: Enforces 10 free post generations per user account.
-- **Neon PostgreSQL**: Multi-tenant draft history library and user storage.
-- **Vercel Serverless Compatible**: Memory base64 image parsing (zero local disk writing).
+DATABASE_URL
+
+JWT_SECRET
+
+Trigger the deployment.
+
+🗺️ Roadmap
+[ ] Support carousel post multi-image uploads.
+
+[ ] Add tone and brand-voice personalization presets.
+
+[ ] Direct publishing via Instagram Graph API.
+
+[ ] Local model fallbacks (Ollama / Llama 3.2 Vision).
+
+🤝 Contributing
+Contributions of any kind are welcome! Whether fixing a typo, refactoring an agent node, or adding whole new features:
+
+Read our Contributing Guide.
+
+Check the open issues or submit a new proposal.
+
+Review our Code of Conduct.
+
+📄 License
+Distributed under the MIT License.
